@@ -1,0 +1,33 @@
+Still working on uploading a working client/server paradigm. For the moment, this is my overview:
+
+1. The client program creates a socket, then connects that socket to the server specified by the user. Once a connection has been established, the client sends a message to the server and waits to receive an echo back from the server.
+
+Meanwhile, the server has also created a socket, and assigned to that socket the IP/port number of the expected connecting client.
+
+Once the server has set up that socket for incoming connections, and after the client has connected its own socket to the specified server, the server then enters a loop where it waits to accept/handle requests from a client.
+
+It is in this loop that the server accepts the message from the client.
+
+
+
+A few of the necessary syscalls for the job...
+
+2. bind(2)
+
+   The bind(2) system call is called for the purpose of "binding a name to a socket." When a user creates a socket with socket(2), the socket exists but has no address assigned to it. The server program uses bind to give its socket a "name" so that it knows where to listen for connections.
+
+3. connect(2)
+
+   The connect(2) system call is called for the purpose of connecting a socket to a specified address. The client program uses connect to attach itself to the already listening server. The idea is for the socket to call connect() only once.
+
+4. listen(2)
+
+   The listen(2) system call is called for the purpose of preparing a socket for accepting incoming connection requests later on. The server program calls listen() to mark its socket as a "passive socket" meaning that its purpose is to be prepared to accept a later connection request.
+
+5. accept(2)
+
+   The accept(2) system call is called for the purpose of finalizing a connection between a server and client. Accept(2) first examines the queue of pending connections for the socket that has been marked by listen(). Accept(2) then takes the first connection request off that queue, creates a new "connected" socket and returns the file descriptor for that new socket.
+
+And finally,
+
+Assuming that we will be communicating over stream sockets or connected datagram sockets, and not regular unconnected datagram sockets, the system calls we will need to implement messaging are send() and recv()... (and by the way, we are using STREAM sockets in this lab). Send() will require the socket descriptor that we want to send data to, as well as a pointer to that data and the length of that data in bytes. On the other end, recv() takes in the socket descriptor to read from, a buffer to insert that information into, and an indicator of how much data to read (maximum size of buffer).  
